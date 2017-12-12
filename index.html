@@ -1,12 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>threejs</title>
-  </head>
-  <body>
-    <section class="wrapper">
-      <h1 id="title">Three.js Playground</h1>
-    </section>
-  </body>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <title>Sound Visualizer</title>
+  <link rel="stylesheet" href="assets/styles/sanitize.css">
+  <style media="screen">
+    #info {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      color: #ffffff;
+    }
+    #info p {
+      margin: 0;
+    }
+    #info a {
+      color: #2194CE;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">
+    <p>Sound Visualizer with <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a></p>
+    <p>music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank" rel="noopener noreferrer">bensound-goinghigher</a></p>
+  </div>
+  <div id="container"></div>
+  <script src="assets/js/three.min.js"></script>
+  <script type="text/javascript">
+    var scene, camera, renderer, analyser, uniforms, audio, mesh;
+    var num = 256;
+    var fftSize = num;
+    var container = document.getElementById('container');
+    scene = new THREE.Scene();
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    var sphereNum = num;
+    createBoxInLine(sphereNum);
+    init();
+    initLight();
+    animate();
+
+    function init(){
+      camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 600 );
+      camera.position.set( 0, 0, 10.0 );
+      camera.lookAt( new THREE.Vector3() );
+
+      var audioLoader = new THREE.AudioLoader();
+      var listener = new THREE.AudioListener();
+      camera.add(listener);
+
+      audio = new THREE.Audio(listener);
+      audioLoader.load('assets/audios/bensound-goinghigher.mp3', function(buffer){
+        audio.setBuffer(buffer);
+        audio.setLoop(true);
+        audio.play();
+      });
+
+      analyser = new THREE.AudioAnalyser(audio, fftSize);
+
+      window.addEventListener('resize', onResize, false);
+    };
+
+    function onResize(){
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    function createBoxInLine(num){
+      for(let i = 0; i < num; i++){
+        var geometry = new THREE.BoxGeometry(5, 5, 5);
+        var material = new THREE.MeshPhongMaterial({ vertexColors: THREE.FaceColors });
+        mesh = new THREE.Mesh(geometry, material);
+        let dx = num / 2.0;
+        let dy = num / 2.0;
+        let dz = 50;
+        mesh.position.set(Math.random() * dx * 4.0 - (dx * 4.0) / 2.0, Math.random() * dy - dy / 2.0, Math.random() * dz * 2.0 + (dz * 2.0) / 2.0);
+        mesh.rotation.set(Math.random() * dx - dx / 2.0, Math.random() * dy - dy / 2.0, Math.random() * dz + dz / 2.0);
+        scene.add(mesh);
+      }
+    }
+
+    function initLight() {
+      light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+      light.position.set( 10, 0, 10 );
+      scene.add( light );
+      light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+      light.position.set( 0, 30, 10 );
+      scene.add( light );
+      light = new THREE.DirectionalLight( 0xFFFFFF, 0.5 );
+      light.position.set( 0, -30, 10 );
+      scene.add( light );
+    }
+
+    function animate(){
+      requestAnimationFrame(animate);
+      render();
+    };
+
+    function render(){
+      var data = analyser.getFrequencyData();
+      var time = performance.now() * 0.001;
+      for(let j = 0; j < num; j++){
+        var gb = j / 256.0;
+        if(data[j] > 0) data[j] += j * .3;
+        if(j >= 80){
+          scene.children[j].scale.set(0.001 + data[j] * 0.008, 0.001 + data[j] * 0.01, 0.001 + data[j] * 0.03);
+          scene.children[j].material.color.setRGB(0.5, 1.0 - gb, 1.0 - gb * 1.5);
+        } else {
+          scene.children[j].scale.set(0.001 + data[j] * 0.01, 0.001 + data[j] * 0.01, 0.001 + data[j] * 0.01);
+          scene.children[j].material.color.setRGB(0.5, 1.0 - gb, 1.0 - gb * 1.5);
+        }
+        scene.children[j].rotation.x += 0.01;
+        scene.children[j].rotation.z += 0.01;
+      }
+      camera.position.set(Math.cos(time * 0.2) * 50.0, Math.sin(time * 0.2) * 50.0, 260.0 + Math.sin(time * 0.2) * 50.0);
+      camera.lookAt(new THREE.Vector3());
+      renderer.render(scene, camera);
+    };
+
+
+  </script>
+</body>
 </html>
