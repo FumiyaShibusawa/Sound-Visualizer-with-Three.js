@@ -1,0 +1,18 @@
+{
+  "name": "webgl-playground",
+  "version": "1.0.0",
+  "description": "This is a playground site for webgl.",
+  "main": "index.js",
+  "dependencies": {
+    "ccapture.js": "^1.0.7",
+    "node-sass": "^4.7.2",
+    "nodemon": "^1.12.1",
+    "sanitize.css": "^5.0.0"
+  },
+  "scripts": {
+    "build-sass": "node-sass --include-path scss scss/input.scss css/style.css",
+    "watch-sass": "nodemon -e scss -x \"npm run build-sass\""
+  },
+  "author": "Fumiya Shibusawa",
+  "license": "ISC"
+}
