@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/FumiyaShibusawa/Sound-Visualizer-with-Three.js/issues"
   },
-  "homepage": "https://github.com/FumiyaShibusawa/Sound-Visualizer-with-Three.js#readme"
+  "homepage": "https://github.com/FumiyaShibusawa/Sound-Visualizer-with-Three.js#readme",
+  "dependencies": {
+    "http-server": "^0.10.0"
+  }
 }
