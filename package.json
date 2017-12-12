@@ -11,7 +11,8 @@
   },
   "scripts": {
     "build-sass": "node-sass --include-path scss scss/input.scss css/style.css",
-    "watch-sass": "nodemon -e scss -x \"npm run build-sass\""
+    "watch-sass": "nodemon -e scss -x \"npm run build-sass\"",
+    "start": "node ./bin/www"
   },
   "author": "Fumiya Shibusawa",
   "license": "ISC"
