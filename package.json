@@ -4,7 +4,7 @@
   "description": "sound visualizer with three.js",
   "main": "index.js",
   "scripts": {
-    "start": "http-server -o html/index.html"
+    "start": "http-server -o"
   },
   "repository": {
     "type": "git",
