@@ -1,0 +1,22 @@
+{
+  "name": "sound-visualizer-with-three",
+  "version": "1.0.0",
+  "description": "sound visualizer with three.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FumiyaShibusawa/Sound-Visualizer-with-Three.js.git"
+  },
+  "keywords": [
+    "advent-calendar"
+  ],
+  "author": "Fumiya Shibusawa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FumiyaShibusawa/Sound-Visualizer-with-Three.js/issues"
+  },
+  "homepage": "https://github.com/FumiyaShibusawa/Sound-Visualizer-with-Three.js#readme"
+}
