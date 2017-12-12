@@ -19,6 +19,20 @@
       color: #2194CE;
       text-decoration: none;
     }
+    #progressbar {
+      margin: 20px;
+      width: 200px;
+      height: 200px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 1.0;
+    }
+    #progressbar.hidden {
+      transition: all .5s ease-in-out;
+      opacity: 0;
+    }
   </style>
 </head>
 <body>
@@ -26,6 +40,38 @@
     <p>Sound Visualizer with <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a></p>
     <p>music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank" rel="noopener noreferrer">bensound-goinghigher</a></p>
   </div>
+  <div id="progressbar"></div>
+  <script src="node_modules/progressbar.js/dist/progressbar.min.js"></script>
+  <script type="text/javascript">
+    var bar = new ProgressBar.Circle('#progressbar', {
+      color: '#ddd',
+      strokeWidth: 4,
+      trailWidth: 1,
+      easing: 'easeInOut',
+      duration: 1400,
+      text: {
+        autoStyleContainer: false
+      },
+      from: { color: '#333', width: 1 },
+      to: { color: '#fff', width: 4 },
+      step: function(state, circle) {
+        circle.path.setAttribute('stroke', state.color);
+        circle.path.setAttribute('stroke-width', state.width);
+
+        var value = circle.value() * 100;
+        if (value === 0) {
+          circle.setText('');
+        } else {
+          circle.setText(value.toFixed(1) + '%');
+        }
+      }
+    });
+    bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
+    bar.text.style.fontSize = '2rem';
+    bar.animate(1.0, () => {
+      bar._container.classList.add('hidden');
+    });
+  </script>
   <div id="container"></div>
   <audio id="audio" src="assets/audios/bensound-goinghigher.mp3" preload="auto"></audio>
   <script src="assets/js/three.min.js"></script>
@@ -75,11 +121,11 @@
 
       camera.add(listener);
 
-      fontLoader = new THREE.FontLoader();
       createTexts();
       animate();
 
       function createTexts(){
+        fontLoader = new THREE.FontLoader();
         fontLoader.load('assets/fonts/plstk.json', (font) => {
           fontObj = font;
           for(let l = 0; l < 256; l++){
@@ -94,7 +140,7 @@
           for(let i = 0; i < grid; i++){
             for(let j = 0; j < grid; j++){
               mesh = new THREE.Mesh(fontGeometries[0], fontMaterial);
-              mesh.position.set( -(WIDTH / 2) + i * (WIDTH / grid + grid / 3) + grid, (HEIGHT / 2) - j * (HEIGHT / grid + 2), 0 );
+              mesh.position.set( -(WIDTH / 2) + i * (WIDTH / grid + grid / 3) + grid * 2, (HEIGHT / 2) - j * (HEIGHT / grid + 2), 0 );
               mesh.rotateX(Math.PI / 2.5);
               // mesh.position.set( -(WIDTH / 2) + i * (WIDTH / grid), (HEIGHT / 2) - j * (HEIGHT / grid), 0 );
               scene.add(mesh);
