@@ -92,7 +92,7 @@
 
     window.onload = function(){
       var fontLoader = new THREE.FontLoader();
-      fontLoader.load('assets/fonts/plstk.json', function(font){
+      fontLoader.load('assets/fonts/plstk-min.json', function(font){
         fontObj = font;
         for(let l = 0; l < 256; l++){
           fontGeometries.push(new THREE.ShapeGeometry(fontObj.generateShapes(l, 1.5, 0)));
