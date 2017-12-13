@@ -137,7 +137,7 @@
         camera.add(listener);
         var audio = new THREE.Audio(listener);
         analyser = new THREE.AudioAnalyser(audio, fftSize);
-        audioLoader.load("assets/audios/bensound-goinghigher.mp3", function(buffer){
+        audioLoader.load("assets/audios/bensound-goinghigher-min.mp3", function(buffer){
           audio.setBuffer(buffer);
           audio.setLoop(true);
           audio.play();
