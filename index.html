@@ -42,8 +42,10 @@
   </div>
   <div id="progressbar"></div>
   <div id="container"></div>
-  <audio id="audio" src="assets/audios/bensound-goinghigher.mp3" preload="auto"></audio>
+  <!-- <audio id="audio" src="assets/audios/bensound-goinghigher.mp3" preload="auto"></audio> -->
   <script src="node_modules/progressbar.js/dist/progressbar.min.js"></script>
+  <script src="assets/js/three.min.js"></script>
+  <script src="assets/js/OrbitControls.js"></script>
   <script type="text/javascript">
     var bar = new ProgressBar.Circle('#progressbar', {
       color: '#ddd',
@@ -74,10 +76,9 @@
       bar._container.classList.add('hidden');
     });
   </script>
-  <script src="assets/js/three.min.js"></script>
-  <script src="assets/js/OrbitControls.js"></script>
+
   <script type="text/javascript">
-    var scene, camera, renderer, analyser;
+    var camera, renderer, analyser, data, fontObj;
     var fftSize = 2048;
     var textNum = fftSize / 2;
     var grid = Math.sqrt(textNum);
@@ -87,64 +88,60 @@
     var WIDTH = window.innerWidth;
     var HEIGHT = window.innerHeight;
     var container = document.getElementById('container');
-    var audioLoader = new THREE.AudioLoader();
-    var listener = new THREE.AudioListener();
-    var audioSrc = document.getElementById('audio');
-    var audio = new THREE.Audio(listener);
-    audioLoader.load(audioSrc.src, function(buffer){
-      audio.setBuffer(buffer);
-      audio.setLoop(true);
-      audio.play();
-    });
-    var analyser = new THREE.AudioAnalyser(audio, fftSize);
+    var scene = new THREE.Scene();
 
     window.onload = function(){
+      var fontLoader = new THREE.FontLoader();
+      fontLoader.load('assets/fonts/plstk.json', function(font){
+        fontObj = font;
+        for(let l = 0; l < 256; l++){
+          fontGeometries.push(new THREE.ShapeGeometry(fontObj.generateShapes(l, 1.5, 0)));
+          fontMaterials = new THREE.MeshBasicMaterial({
+            color: 0x006699,
+            opacity: 0.4,
+            side: THREE.DoubleSide
+          });
+        }
 
-      scene = new THREE.Scene();
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setClearColor(0x000000);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      container.appendChild(renderer.domElement);
-      window.addEventListener('resize', () => {
-        WIDTH = window.innerWidth;
-        HEIGHT = window.innerHeight;
-        renderer.setSize(WIDTH, HEIGHT);
-      }, false);
-
-      camera = new THREE.OrthographicCamera( WIDTH / - 2, WIDTH / 2, HEIGHT / 2, HEIGHT / - 2, 0.1, 1000 );
-      controls = new THREE.OrbitControls(camera);
-      controls.autoRotate = true;
-      camera.position.set( 0, -500, 500.0 );
-      camera.lookAt( new THREE.Vector3() );
-
-      camera.add(listener);
-
-      createTexts();
-      animate();
-
-      function createTexts(){
-        fontLoader = new THREE.FontLoader();
-        fontLoader.load('assets/fonts/plstk.json', function(font){
-          fontObj = font;
-          for(let l = 0; l < 256; l++){
-            fontGeometries.push(new THREE.ShapeGeometry(fontObj.generateShapes(l, 1.5, 0)));
-            fontMaterials = new THREE.MeshBasicMaterial({
-              color: 0x006699,
-              opacity: 0.4,
-              side: THREE.DoubleSide
-            });
+        for(let i = 0; i < grid; i++){
+          for(let j = 0; j < grid; j++){
+            mesh = new THREE.Mesh(fontGeometries[0], fontMaterials[0]);
+            mesh.position.set( -(WIDTH / 2) + i * (WIDTH / grid + grid / 3) + grid * 2, (HEIGHT / 2) - j * (HEIGHT / grid + 2), 0 );
+            mesh.rotateX(Math.PI / 2.5);
+            scene.add(mesh);
           }
+        }
+        init();
+      });
 
-          for(let i = 0; i < grid; i++){
-            for(let j = 0; j < grid; j++){
-              mesh = new THREE.Mesh(fontGeometries[0], fontMaterials[0]);
-              mesh.position.set( -(WIDTH / 2) + i * (WIDTH / grid + grid / 3) + grid * 2, (HEIGHT / 2) - j * (HEIGHT / grid + 2), 0 );
-              mesh.rotateX(Math.PI / 2.5);
-              scene.add(mesh);
-            }
-          }
+      function init(){
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+        window.addEventListener('resize', () => {
+          WIDTH = window.innerWidth;
+          HEIGHT = window.innerHeight;
+          renderer.setSize(WIDTH, HEIGHT);
+        }, false);
 
+        camera = new THREE.OrthographicCamera( WIDTH / - 2, WIDTH / 2, HEIGHT / 2, HEIGHT / - 2, 0.1, 1000 );
+        controls = new THREE.OrbitControls(camera);
+        controls.autoRotate = true;
+        camera.position.set( 0, -500, 500.0 );
+        camera.lookAt( new THREE.Vector3() );
+
+        var audioLoader = new THREE.AudioLoader();
+        var listener = new THREE.AudioListener();
+        camera.add(listener);
+        var audio = new THREE.Audio(listener);
+        analyser = new THREE.AudioAnalyser(audio, fftSize);
+        audioLoader.load("assets/audios/bensound-goinghigher.mp3", function(buffer){
+          audio.setBuffer(buffer);
+          audio.setLoop(true);
+          audio.play();
+          animate();
         });
       };
 
@@ -169,8 +166,6 @@
       };
 
     };
-
-
 
   </script>
 </body>
