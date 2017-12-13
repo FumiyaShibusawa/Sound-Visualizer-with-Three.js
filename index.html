@@ -41,6 +41,8 @@
     <p>music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank" rel="noopener noreferrer">bensound-goinghigher</a></p>
   </div>
   <div id="progressbar"></div>
+  <div id="container"></div>
+  <audio id="audio" src="assets/audios/bensound-goinghigher.mp3" preload="auto"></audio>
   <script src="node_modules/progressbar.js/dist/progressbar.min.js"></script>
   <script type="text/javascript">
     var bar = new ProgressBar.Circle('#progressbar', {
@@ -68,16 +70,14 @@
     });
     bar.text.style.fontFamily = '"Raleway", Helvetica, sans-serif';
     bar.text.style.fontSize = '2rem';
-    bar.animate(1.0, () => {
+    bar.animate(1.0, function() {
       bar._container.classList.add('hidden');
     });
   </script>
-  <div id="container"></div>
-  <audio id="audio" src="assets/audios/bensound-goinghigher.mp3" preload="auto"></audio>
   <script src="assets/js/three.min.js"></script>
   <script src="assets/js/OrbitControls.js"></script>
   <script type="text/javascript">
-    var scene, camera, renderer, analyser, uniforms, audio, mesh, fontLoader, fontObj, shapes, fontMaterial, data;
+    var scene, camera, renderer, analyser;
     var fftSize = 2048;
     var textNum = fftSize / 2;
     var grid = Math.sqrt(textNum);
@@ -90,7 +90,7 @@
     var audioLoader = new THREE.AudioLoader();
     var listener = new THREE.AudioListener();
     var audioSrc = document.getElementById('audio');
-    audio = new THREE.Audio(listener);
+    var audio = new THREE.Audio(listener);
     audioLoader.load(audioSrc.src, function(buffer){
       audio.setBuffer(buffer);
       audio.setLoop(true);
@@ -98,7 +98,7 @@
     });
     var analyser = new THREE.AudioAnalyser(audio, fftSize);
 
-    window.onload = () => {
+    window.onload = function(){
 
       scene = new THREE.Scene();
       renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -113,7 +113,6 @@
       }, false);
 
       camera = new THREE.OrthographicCamera( WIDTH / - 2, WIDTH / 2, HEIGHT / 2, HEIGHT / - 2, 0.1, 1000 );
-      // camera = new THREE.PerspectiveCamera( 90, WIDTH / HEIGHT, 0.1, 1500 );
       controls = new THREE.OrbitControls(camera);
       controls.autoRotate = true;
       camera.position.set( 0, -500, 500.0 );
@@ -126,7 +125,7 @@
 
       function createTexts(){
         fontLoader = new THREE.FontLoader();
-        fontLoader.load('assets/fonts/plstk.json', (font) => {
+        fontLoader.load('assets/fonts/plstk.json', function(font){
           fontObj = font;
           for(let l = 0; l < 256; l++){
             fontGeometries.push(new THREE.ShapeGeometry(fontObj.generateShapes(l, 1.5, 0)));
@@ -139,10 +138,9 @@
 
           for(let i = 0; i < grid; i++){
             for(let j = 0; j < grid; j++){
-              mesh = new THREE.Mesh(fontGeometries[0], fontMaterial);
+              mesh = new THREE.Mesh(fontGeometries[0], fontMaterials[0]);
               mesh.position.set( -(WIDTH / 2) + i * (WIDTH / grid + grid / 3) + grid * 2, (HEIGHT / 2) - j * (HEIGHT / grid + 2), 0 );
               mesh.rotateX(Math.PI / 2.5);
-              // mesh.position.set( -(WIDTH / 2) + i * (WIDTH / grid), (HEIGHT / 2) - j * (HEIGHT / grid), 0 );
               scene.add(mesh);
             }
           }
@@ -152,10 +150,10 @@
 
       function animate(){
         requestAnimationFrame(animate);
-        render();
+        renderNumberMap();
       };
 
-      function render(){
+      function renderNumberMap(){
         data = analyser.getFrequencyData();
         for(let k = 0; k < data.length; k++){
           scene.children[k].geometry = fontGeometries[data[k]];
